@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+from xgboost import XGBClassifier
+import xgboost as xgb
+import numpy as np
+from sklearn.model_selection import GridSearchCV
+
+def model_xgb(X_train,y_train):
+
+    #xgb_train = xgb.DMatrix(X_train,label=y_train)
+
+    model = XGBClassifier(
+        learning_rate=0.1,
+        n_estimators=500,
+        max_depth=5,
+        min_child_weight=1,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        gamma=0,
+        reg_alpha=0,
+        reg_lambda=1,
+        nthread=4
+    )
+    param_dist = {
+        #"max_depth": [10,30,50],
+        #"min_child_weight" : [1],
+        "n_estimators": np.arange(400,800,100),
+        #"learning_rate": [0.16],
+    }
+    grid_search = GridSearchCV(
+        model,
+        param_grid=param_dist,
+        cv = 3,
+        verbose=10,
+        n_jobs=-1
+    )
+
+    #grid_search.fit(X_train, y_train)
+    #print(grid_search.best_estimator_)
+    #print('参数的最佳取值：{0}'.format(grid_search.best_params_))
+    #print('最佳模型得分:{0}'.format(grid_search.best_score_))
+
+
+    xgb_model_best = model.fit(X_train,y_train)
+    #y_prob = xgb_model_best.predict_prob(X_test)[:,1]
+    #y_pred = np.where(y_prob>0.5,1,0)
+
+    return xgb_model_best
